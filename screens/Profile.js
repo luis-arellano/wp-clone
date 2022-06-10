@@ -15,11 +15,13 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { auth, db } from "../firebase";
 import { updateProfile } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
+import { useNavigation } from "@react-navigation/native";
 
 export default function Profile() {
   const [displayName, setDisplayName] = useState("");
   const [selectedImage, setSelectedImage] = useState(null);
   const [permissionStatus, setPermisssionStatus] = useState(null);
+  const navigation = useNavigation();
 
   useEffect(() => {
     //we have to do this, because we need an asyc function, but hooks (use effect)
@@ -63,11 +65,13 @@ export default function Profile() {
       userData.photoURL = photoURL;
     }
 
-    console.log("ABOUT TO CALL PROMISE ALL......");
+    // TODO: add a loader to this screen
     await Promise.all([
       updateProfile(user, userData),
       setDoc(doc(db, "users", user.uid), { ...userData, uid: user.uid }),
     ]);
+
+    navigation.navigate("Home");
   }
 
   /** Handles the pressing on profile picture */

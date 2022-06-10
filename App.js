@@ -69,7 +69,9 @@ function App() {
             headerTintColor: colors.white,
           }}
         >
-          {currUser.displayName && (
+          {/* If the user profile is not ready, show them
+           the Profile Screen to update name and photo*/}
+          {!currUser.displayName && (
             <Stack.Screen
               name="profile"
               component={Profile}
@@ -89,7 +91,43 @@ function App() {
 }
 
 function Home() {
-  return <Text> HI I don't have a profile</Text>;
+  const {
+    theme: { colors },
+  } = useContext(Context);
+  return (
+    // using screenOpstion with a route function to customize
+    <Tab.Navigator
+      screenOptions={({ route }) => {
+        return {
+          tabBarLabel: () => {
+            if (route.name == "photo") {
+              return <Ionicons name="camera" size={20} color={colors.white} />;
+            } else {
+              return (
+                <Text style={{ color: colors.white }}>
+                  {route.name.toLocaleUpperCase()}
+                </Text>
+              );
+            }
+          },
+          tabBarShowIcon: true,
+          tabBarLabelStyle: {
+            color: colors.white,
+          },
+          tabBarIndicatorStyle: {
+            backgroundColor: colors.white,
+          },
+          tabBarStyle: {
+            backgroundColor: colors.foreground,
+          },
+        };
+      }}
+      initialRouteName="chats"
+    >
+      <Tab.Screen name="photo" component={Photo}></Tab.Screen>
+      <Tab.Screen name="chats" component={Chats}></Tab.Screen>
+    </Tab.Navigator>
+  );
 }
 
 // Loads the main resources and returning the main App.
