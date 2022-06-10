@@ -1,31 +1,32 @@
-import { StatusBar } from "expo-status-bar";
-import React, { useContext, useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Image,
-  TextInput,
-  Button,
-} from "react-native";
+import { Text, View, Image, Button } from "react-native";
+import React, {
+  Component,
+  useContext,
+  useEffect,
+  useInsertionEffect,
+  useState,
+} from "react";
+import { StatusBar } from "react-native-web";
 import Constants from "expo-constants";
+import { askForPermission, theme, uploadImage, pickImage } from "../utils";
 import GlobalContext from "../context/Context";
+import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { pickImage, askForPermission, uploadImage } from "../utils";
 import { auth, db } from "../firebase";
-import { updateProfile } from "@firebase/auth";
-import { doc, setDoc } from "@firebase/firestore";
-import { useNavigation } from "@react-navigation/native";
+import { updateProfile } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
 
 export default function Profile() {
   const [displayName, setDisplayName] = useState("");
   const [selectedImage, setSelectedImage] = useState(null);
-  const [permissionStatus, setPermissionStatus] = useState(null);
-  const navigation = useNavigation();
+  const [permissionStatus, setPermisssionStatus] = useState(null);
+
   useEffect(() => {
+    //we have to do this, because we need an asyc function, but hooks (use effect)
+    // don't allow aysnc functions. so we set-up an async function.
     (async () => {
       const status = await askForPermission();
-      setPermissionStatus(status);
+      setPermisssionStatus(status);
     })();
   }, []);
 
@@ -33,6 +34,15 @@ export default function Profile() {
     theme: { colors },
   } = useContext(GlobalContext);
 
+  if (!permissionStatus) {
+    return <Text>Loading...</Text>;
+  }
+
+  if (permissionStatus != "granted") {
+    return <Text>You need to allow this persmission</Text>;
+  }
+
+  /** Uploads the image to Firebase */
   async function handlePress() {
     const user = auth.currentUser;
     let photoURL;
@@ -48,17 +58,19 @@ export default function Profile() {
       displayName,
       email: user.email,
     };
+
     if (photoURL) {
       userData.photoURL = photoURL;
     }
 
+    console.log("ABOUT TO CALL PROMISE ALL......");
     await Promise.all([
       updateProfile(user, userData),
       setDoc(doc(db, "users", user.uid), { ...userData, uid: user.uid }),
     ]);
-    navigation.navigate("home");
   }
 
+  /** Handles the pressing on profile picture */
   async function handleProfilePicture() {
     const result = await pickImage();
     if (!result.cancelled) {
@@ -66,15 +78,9 @@ export default function Profile() {
     }
   }
 
-  if (!permissionStatus) {
-    return <Text>Loading</Text>;
-  }
-  if (permissionStatus !== "granted") {
-    return <Text>You need to allow this permission</Text>;
-  }
   return (
     <React.Fragment>
-      <StatusBar style="auto" />
+      <StatusBar style="auto"></StatusBar>
       <View
         style={{
           alignItems: "center",
@@ -84,10 +90,21 @@ export default function Profile() {
           padding: 20,
         }}
       >
-        <Text style={{ fontSize: 22, color: colors.foreground }}>
+        <Text
+          style={{
+            fontSize: 22,
+            color: colors.foreground,
+          }}
+        >
           Profile Info
         </Text>
-        <Text style={{ fontSize: 14, color: colors.text, marginTop: 20 }}>
+        <Text
+          style={{
+            fontSize: 14,
+            color: colors.text,
+            marginTop: 20,
+          }}
+        >
           Please provide your name and an optional profile photo
         </Text>
         <TouchableOpacity
@@ -97,9 +114,9 @@ export default function Profile() {
             borderRadius: 120,
             width: 120,
             height: 120,
-            backgroundColor: colors.background,
-            alignItems: "center",
             justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: colors.background,
           }}
         >
           {!selectedImage ? (
@@ -128,7 +145,7 @@ export default function Profile() {
         />
         <View style={{ marginTop: "auto", width: 80 }}>
           <Button
-            title="Next"
+            title="next"
             color={colors.secondary}
             onPress={handlePress}
             disabled={!displayName}

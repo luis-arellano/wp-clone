@@ -3,7 +3,7 @@ import { Text, View, LogBox } from "react-native";
 import { useAssets } from "expo-asset";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./firebase";
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, StackActions } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import SignIn from "./screens/SignIn";
@@ -14,13 +14,18 @@ import Chats from "./screens/Chats";
 import Photo from "./screens/Photo";
 import { Ionicons } from "@expo/vector-icons";
 import Contacts from "./screens/Contacts";
-import Chat from './screens/Chat'
-import ChatHeader from './components/ChatHeader'
+import Chat from "./screens/Chat";
+import ChatHeader from "./components/ChatHeader";
+import { StatusBar } from "expo-status-bar";
+import { backgroundColor } from "react-native/Libraries/Components/View/ReactNativeStyleAttributes";
+import { withSafeAreaInsets } from "react-native-safe-area-context";
+
 LogBox.ignoreLogs([
   "Setting a timer",
   "AsyncStorage has been extracted from react-native core and will be removed in a future release.",
 ]);
 
+// component used to nest navigations.
 const Stack = createStackNavigator();
 const Tab = createMaterialTopTabNavigator();
 
@@ -31,6 +36,7 @@ function App() {
     theme: { colors },
   } = useContext(Context);
 
+  // this is to subscribe to firebase to listen when the user signs-in or signs-out from the app.
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setLoading(false);
@@ -38,6 +44,7 @@ function App() {
         setCurrUser(user);
       }
     });
+    // to clean up the subscription
     return () => unsubscribe();
   }, []);
 
@@ -62,7 +69,7 @@ function App() {
             headerTintColor: colors.white,
           }}
         >
-          {!currUser.displayName && (
+          {currUser.displayName && (
             <Stack.Screen
               name="profile"
               component={Profile}
@@ -71,59 +78,21 @@ function App() {
           )}
           <Stack.Screen
             name="home"
-            options={{ title: "Whatsapp" }}
+            options={{ title: "Shaka" }}
             component={Home}
           />
-          <Stack.Screen
-            name="contacts"
-            options={{ title: "Select Contacts" }}
-            component={Contacts}
-          />
-          <Stack.Screen name="chat" component={Chat} options={{headerTitle: (props) => <ChatHeader {...props} />}}/>
         </Stack.Navigator>
       )}
+      <StatusBar style="auto" />
     </NavigationContainer>
   );
 }
+
 function Home() {
-  const {
-    theme: { colors },
-  } = useContext(Context);
-  return (
-    <Tab.Navigator
-      screenOptions={({ route }) => {
-        return {
-          tabBarLabel: () => {
-            if (route.name === "photo") {
-              return <Ionicons name="camera" size={20} color={colors.white} />;
-            } else {
-              return (
-                <Text style={{ color: colors.white }}>
-                  {route.name.toLocaleUpperCase()}
-                </Text>
-              );
-            }
-          },
-          tabBarShowIcon: true,
-          tabBarLabelStyle: {
-            color: colors.white,
-          },
-          tabBarIndicatorStyle: {
-            backgroundColor: colors.white,
-          },
-          tabBarStyle: {
-            backgroundColor: colors.foreground,
-          },
-        };
-      }}
-      initialRouteName="chats"
-    >
-      <Tab.Screen name="photo" component={Photo} />
-      <Tab.Screen name="chats" component={Chats} />
-    </Tab.Navigator>
-  );
+  return <Text> HI I don't have a profile</Text>;
 }
 
+// Loads the main resources and returning the main App.
 function Main() {
   const [assets] = useAssets(
     require("./assets/icon-square.png"),
