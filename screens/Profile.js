@@ -22,6 +22,9 @@ export default function Profile() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [permissionStatus, setPermisssionStatus] = useState(null);
   const navigation = useNavigation();
+  const {
+    theme: { colors },
+  } = useContext(GlobalContext);
 
   useEffect(() => {
     //we have to do this, because we need an asyc function, but hooks (use effect)
@@ -31,10 +34,6 @@ export default function Profile() {
       setPermisssionStatus(status);
     })();
   }, []);
-
-  const {
-    theme: { colors },
-  } = useContext(GlobalContext);
 
   if (!permissionStatus) {
     return <Text>Loading...</Text>;
@@ -71,7 +70,7 @@ export default function Profile() {
       setDoc(doc(db, "users", user.uid), { ...userData, uid: user.uid }),
     ]);
 
-    navigation.navigate("Home");
+    navigation.navigate("home");
   }
 
   /** Handles the pressing on profile picture */

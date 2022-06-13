@@ -1,13 +1,16 @@
-import React, { useContext } from "react";
 import { TouchableOpacity } from "react-native";
+import React, { useContext } from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import GlobalContext from "../context/Context";
 import { useNavigation } from "@react-navigation/native";
+
 export default function ContactsFloatingIcon() {
   const {
     theme: { colors },
   } = useContext(GlobalContext);
+
   const navigation = useNavigation();
+
   return (
     <TouchableOpacity
       onPress={() => navigation.navigate("contacts")}
@@ -27,7 +30,7 @@ export default function ContactsFloatingIcon() {
         name="android-messages"
         size={30}
         color="white"
-        style={{ transform: [{ scaleX: -1 }] }}
+        // style={{ transform: [{ scale: -1 }] }}
       />
     </TouchableOpacity>
   );
