@@ -83,6 +83,11 @@ function App() {
             options={{ title: "Shaka" }}
             component={Home}
           />
+          <Stack.Screen
+            name="contacts"
+            options={{ title: "Select Contacts" }}
+            component={Contacts}
+          />
         </Stack.Navigator>
       )}
       <StatusBar style="auto" />
@@ -141,6 +146,9 @@ function Main() {
   if (!assets) {
     return <Text>Loading ..</Text>;
   }
+  // we wrap the app on context wrapper to access comon utils
+  // that are delared on ContextWreapper, and will be available to all
+  // components within the app
   return (
     <ContextWrapper>
       <App />
