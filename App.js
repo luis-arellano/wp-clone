@@ -88,6 +88,11 @@ function App() {
             options={{ title: "Select Contacts" }}
             component={Contacts}
           />
+          <Stack.Screen
+            name="chat"
+            options={{ headerTitle: (props) => <ChatHeader {...props} /> }}
+            component={Chat}
+          />
         </Stack.Navigator>
       )}
       <StatusBar style="auto" />

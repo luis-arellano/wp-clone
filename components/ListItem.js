@@ -5,6 +5,10 @@ import GlobalContext from "../context/Context";
 import { Grid, Row, Col } from "react-native-easy-grid";
 import Avatar from "./Avatar";
 
+/** Reusable Component to Display a List of Touchable items
+ *
+ *  Used on Contacts Screen
+ */
 export default function ListItem({
   type,
   description,
@@ -27,14 +31,37 @@ export default function ListItem({
         <Col
           style={{ width: 80, alignItems: "center", justifyContent: "center" }}
         >
-          <Avatar user={user} size={type == "contacts" ? 45 : 65} />
+          <Avatar user={user} size={type == "contacts" ? 40 : 60} />
         </Col>
         <Col style={{ marginLeft: 10 }}>
           <Row style={{ alignItems: "center" }}>
             <Col>
-              <Text>{user.contactName || user.displayName}</Text>
+              <Text
+                style={{
+                  fontWeight: "bold",
+                  fontSize: 16,
+                  color: colors.text,
+                }}
+              >
+                {user.contactName || user.displayName}
+              </Text>
             </Col>
+            {time && (
+              <Col style={{ alignItems: "center" }}>
+                <Text style={{ color: colors.secondaryText, fontSize: 11 }}>
+                  {" "}
+                  {new Date(time.seconds * 1000).toLocaleDateString}
+                </Text>
+              </Col>
+            )}
           </Row>
+          {description && (
+            <Row style={{ marginTop: -5 }}>
+              <Text style={{ color: colors.secondaryText, fontSize: 13 }}>
+                {description}
+              </Text>
+            </Row>
+          )}
         </Col>
       </Grid>
     </TouchableOpacity>
