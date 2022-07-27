@@ -7,7 +7,7 @@ import Avatar from "./Avatar";
 
 /** Reusable Component to Display a List of Touchable items
  *
- *  Used on Contacts Screen
+ *  Used on Contacts Screen and Chats Screen
  */
 export default function ListItem({
   type,
@@ -46,6 +46,8 @@ export default function ListItem({
                 {user.contactName || user.displayName}
               </Text>
             </Col>
+
+            {/* if we have time info, we have another column  */}
             {time && (
               <Col style={{ alignItems: "center" }}>
                 <Text style={{ color: colors.secondaryText, fontSize: 11 }}>
@@ -55,6 +57,8 @@ export default function ListItem({
               </Col>
             )}
           </Row>
+
+          {/* if we have a description, add the corresponding text */}
           {description && (
             <Row style={{ marginTop: -5 }}>
               <Text style={{ color: colors.secondaryText, fontSize: 13 }}>

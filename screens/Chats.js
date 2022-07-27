@@ -51,13 +51,14 @@ export default function Chats() {
 
   return (
     <View style={{ flex: 1, padding: 5, paddingRight: 10 }}>
+      {/* we use the rooms from context and map them. */}
       {rooms.map((room) => (
         <ListItem
           type="chat"
           description={room.lastMessage.text}
           key={room.id}
           time={room.lastMessage.createdAt}
-          user={(getUserB(chat.userB), contacts)}
+          user={(getUserB(room.userB), contacts)}
         />
       ))}
       <ContactsFloatingIcon />

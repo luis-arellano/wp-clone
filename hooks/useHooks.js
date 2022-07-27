@@ -5,6 +5,7 @@ import * as Contacts from "expo-contacts";
 
 export default function useContacts() {
   const [contacts, setContacts] = useState([]);
+  
   useEffect(() => {
     (async () => {
       const { status } = await Contacts.requestPermissionsAsync();
