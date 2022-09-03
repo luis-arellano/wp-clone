@@ -7,11 +7,13 @@ import { useRoute } from "@react-navigation/native";
 import { nanoid } from "nanoid";
 import GlobalContext from "../context/Context";
 import { GiftedChat } from "react-native-gifted-chat";
+
 import {
+  addDoc,
+  updateDoc,
   collection,
   doc,
   onSnapshot,
-  QuerySnapshot,
   setDoc,
 } from "firebase/firestore";
 
@@ -41,9 +43,11 @@ export default function Chat() {
   const roomRef = doc(db, "rooms", roomId);
 
   // messages is a subcolletion of the document rooms
-  const roomMessageRef = collection(db, "rooms", roomId, "messages");
+  const roomMessagesRef = collection(db, "rooms", roomId, "messages");
 
-  // should create a new room if there is no room already.
+  /**
+   * Creates a Room on colletion.
+   *  */
   useEffect(() => {
     (async () => {
       if (!room) {
@@ -63,7 +67,7 @@ export default function Chat() {
         }
         const roomData = {
           participants: [currentUserData, userBData],
-          pariticpantsArray: [currentUser.email, userB.email],
+          participantsArray: [currentUser.email, userB.email],
         };
         try {
           await setDoc(roomRef, roomData);
@@ -78,15 +82,17 @@ export default function Chat() {
 
   // This use Effect will be used to render the messages.
   useEffect(() => {
-    const unsubscribe = onSnapshot(roomMessageRef, (QuerySnapshot) => {
+    const unsubscribe = onSnapshot(roomMessagesRef, (querySnapshot) => {
       // just get messages when doc changes
-      const messagesFirestory = QuerySnapshot.docChanges()
+      const messagesFirestore = querySnapshot
+        .docChanges()
         .filter(({ type }) => type == "added")
         .map(({ doc }) => {
           const message = doc.data();
           return { ...message, createAt: message.createdAt.toDate() };
         });
-      appendMessages(messages);
+      console.log("MESSAGED:", messagesFirestore);
+      appendMessages(messagesFirestore);
     });
     return () => unsubscribe();
   }, []);
@@ -101,13 +107,26 @@ export default function Chat() {
     [messages]
   );
 
+  // Function to Send messages to firestore and save them
+  async function onSend(messages = []) {
+    const writes = messages.map((m) => addDoc(roomMessagesRef, m));
+    const lastMessage = messages[messages.length - 1];
+    writes.push(updateDoc(roomRef, { lastMessage }));
+    await Promise.all(writes);
+  }
+
   return (
     <ImageBackground
       resizeMode="cover"
       source={require("../assets/chatbg.png")}
       style={{ flex: 1 }}
     >
-      <Text>Chat</Text>
+      <GiftedChat
+        onSend={onSend}
+        messages={messages}
+        user={senderUser}
+        renderAvatar={null}
+      />
     </ImageBackground>
   );
 }

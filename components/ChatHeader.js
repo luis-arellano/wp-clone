@@ -22,7 +22,7 @@ export default function ChatHeader() {
         }}
       >
         <Text style={{ color: colors.white, fontSize: 18 }}>
-          {route.params.user.contactName || route.params.users.displayName}
+          {route.params.user.contactName || route.params.user.displayName}
         </Text>
       </View>
     </View>

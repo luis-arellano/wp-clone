@@ -27,7 +27,7 @@ export default function Contacts() {
 }
 
 function ContactPreview({ contact, image }) {
-  const { rooms } = useContext(GlobalContext);
+  const { unfilteredRooms, rooms } = useContext(GlobalContext);
   const [user, setUser] = useState(contact);
 
   // Fetch contact information using contact email from db
@@ -54,8 +54,8 @@ function ContactPreview({ contact, image }) {
       style={{ marginTop: 7 }}
       user={user}
       image={image}
-      room={rooms.find((room) =>
-        rooms.participantsArray.includes(contact.email)
+      room={unfilteredRooms.find((room) =>
+        room.participantsArray.includes(contact.email)
       )}
     />
   );
