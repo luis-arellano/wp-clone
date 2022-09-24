@@ -51,6 +51,7 @@ export default function Chats() {
           type="chat"
           description={room.lastMessage.text}
           key={room.id}
+          room={room}
           time={room.lastMessage.createdAt}
           user={(getUserB(room.userB), contacts)}
         />

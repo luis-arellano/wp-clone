@@ -21,7 +21,7 @@ const randomId = nanoid();
 
 export default function Chat() {
   const [roomHash, setRoomHash] = useState("");
-  const [messages, setMessages] = useState("");
+  const [messages, setMessages] = useState([]);
   const {
     theme: { colors },
   } = useContext(GlobalContext);
@@ -42,7 +42,7 @@ export default function Chat() {
   const roomId = room ? room.id : randomId;
   const roomRef = doc(db, "rooms", roomId);
 
-  // messages is a subcolletion of the document rooms
+  // messages is a subcolletion of the document rooms 3:28
   const roomMessagesRef = collection(db, "rooms", roomId, "messages");
 
   /**
@@ -51,6 +51,7 @@ export default function Chat() {
   useEffect(() => {
     (async () => {
       if (!room) {
+        console.log("NO ROOM ID");
         const currentUserData = {
           displayName: currentUser.displayName,
           email: currentUser.email,
@@ -83,15 +84,14 @@ export default function Chat() {
   // This use Effect will be used to render the messages.
   useEffect(() => {
     const unsubscribe = onSnapshot(roomMessagesRef, (querySnapshot) => {
-      // just get messages when doc changes
       const messagesFirestore = querySnapshot
         .docChanges()
         .filter(({ type }) => type == "added")
         .map(({ doc }) => {
           const message = doc.data();
-          return { ...message, createAt: message.createdAt.toDate() };
-        });
-      console.log("MESSAGED:", messagesFirestore);
+          return { ...message, createdAt: message.createdAt.toDate() };
+        })
+        .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
       appendMessages(messagesFirestore);
     });
     return () => unsubscribe();
