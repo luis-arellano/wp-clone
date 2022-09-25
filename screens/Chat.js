@@ -6,7 +6,8 @@ import { db, auth } from "../firebase";
 import { useRoute } from "@react-navigation/native";
 import { nanoid } from "nanoid";
 import GlobalContext from "../context/Context";
-import { GiftedChat } from "react-native-gifted-chat";
+import { Actions, GiftedChat, InputToolbar } from "react-native-gifted-chat";
+import { Ionicons } from "@expo/vector-icons";
 
 import {
   addDoc,
@@ -16,6 +17,8 @@ import {
   onSnapshot,
   setDoc,
 } from "firebase/firestore";
+import { Touchable } from "react-native-web";
+import { TouchableOpacity } from "react-native";
 
 const randomId = nanoid();
 
@@ -115,6 +118,9 @@ export default function Chat() {
     await Promise.all(writes);
   }
 
+  // Method to take photos
+  function HandlePhotoPicker() {}
+
   return (
     <ImageBackground
       resizeMode="cover"
@@ -126,6 +132,61 @@ export default function Chat() {
         messages={messages}
         user={senderUser}
         renderAvatar={null}
+        renderActions={(props) => (
+          <Actions
+            {...props}
+            containerStyle={{
+              position: "absolute",
+              right: 50,
+              bottom: 5,
+              zIndex: 999,
+            }}
+            onPressActionButton={HandlePhotoPicker}
+            icon={() => (
+              <Ionicons name="camera" size={30} colors={colors.iconGray} />
+            )}
+          />
+        )}
+        timeTextStyle={{ right: { color: colors.iconGray } }}
+        renderSend={(props) => {
+          const { text, messageIdGenerator, user, onSend } = props;
+          return (
+            <TouchableOpacity
+              style={{
+                height: 40,
+                width: 40,
+                borderRadius: 40,
+                backgroundColor: colors.primary,
+                alignItems: "center",
+                justifyContent: "center",
+                marginBottom: 5,
+              }}
+              onPress={() => {
+                if (text && onSend) {
+                  onSend({
+                    text: text.trim(),
+                    user,
+                    _id: messageIdGenerator(),
+                  });
+                }
+              }}
+            >
+              <Ionicons name="send" size={20} color={colors.white} />
+            </TouchableOpacity>
+          );
+        }}
+        renderInputToolbar={(props) => (
+          <InputToolbar
+            {...props}
+            containerStyle={{
+              marginLeft: 10,
+              marginRight: 10,
+              marginBottom: 2,
+              borderRadius: 20,
+              paddingTop: 5,
+            }}
+          />
+        )}
       />
     </ImageBackground>
   );
